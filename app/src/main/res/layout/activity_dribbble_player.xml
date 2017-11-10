@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<io.plainapp.ui.widget.ElasticDragDismissFrameLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/draggable_frame"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:transitionGroup="false"
+  app:dragDismissDistance="@dimen/drag_dismiss_distance"
+  app:dragDismissScale="0.95">
+
+  <!-- need a separate view for the background to target during the window transition -->
+  <View
+    android:id="@+id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_light"
+    android:elevation="@dimen/z_card"
+    android:transitionName="@string/transition_player_background" />
+
+  <android.support.constraint.ConstraintLayout
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="@dimen/z_card"
+    android:transitionGroup="false"
+    android:background="@android:color/transparent">
+
+    <ImageView
+      android:id="@+id/avatar"
+      android:layout_width="@dimen/large_avatar_size"
+      android:layout_height="@dimen/large_avatar_size"
+      android:layout_marginTop="@dimen/spacing_micro"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:elevation="@dimen/z_card"
+      android:padding="@dimen/avatar_padding"
+      android:transitionName="@string/transition_player_avatar"
+      android:src="@drawable/avatar_placeholder" />
+
+    <io.plaidapp.ui.widget.BaselineGridTextView
+      android:id="@+id/player_name"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/avatar"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:paddingStart="@dimen/padding_normal"
+      android:paddingTop="@dimen/avatar_margin"
+      android:paddingEnd="@dimen/padding_normal"
+      android:paddingBottom="@dimen/spacing_normal"
+      android:textAppearance="@style/TextAppearance.Author.Title"
+      tools:text="Nick Butcher" />
+
+  </android.support.constraint.ConstraintLayout>
+
+  <include
+    layout="@layout/loading"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/spacing_huge"
+    android:layout_gravity="bottom|center_horizontal" />
+
+  <android.support.v7.widget.RecyclerView
+    android:id="@+id/player_shots"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:elevation="@dimen/z_card"
+    android:scrollbars="vertical"
+    android:scrollbarStyle="outsideOverlay"
+    android:clipToPadding="false"
+    android:visibility="gone" />
+
+</io.plainapp.ui.widget.ElasticDragDismissFrameLayout>

@@ -45,7 +45,12 @@
   <dimen name="avatar_padding">4dp</dimen> <!-- (avatar_bounds - avatar_size) / 2 -->
   <dimen name="avatar_margin">12dp</dimen> <!-- padding_normal - avatar_padding -->
   <dimen name="avatar_ripple_radius">20dp</dimen> <!-- avatar_size / 2 -->
+  <dimen name="comment_actions_height">40dp</dimen>
+  <dimen name="comment_like_margin_adjustment">-8dp</dimen>
 
+  <!-- dribbble player -->
+  <dimen name="large_avatar_size">120dp</dimen> <!-- 2 * actionBarSize - 2 * avatar_padding -->
+  <dimen name="large_avatar_height">160dp</dimen> <!-- large_avatar_margin + large_avatar_size + avatar_margin -->
 
   <!-- bottom sheet -->
   <dimen name="bottom_sheet_width">@dimen/match_parent</dimen>

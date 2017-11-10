@@ -36,6 +36,7 @@
 
 
 
+  <color name="grey_300">#ffe0e0e0</color>
   <color name="content_placeholder">#ffe0e0e0</color>
   <color name="dark_icon">#99000000</color> <!-- 60% black-->
   <color name="dark_icon_half_alpha">#4d000000</color> <!-- 30% black-->

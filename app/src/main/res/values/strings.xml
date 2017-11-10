@@ -1,5 +1,13 @@
 <resources>
+
+  <!-- global -->
   <string name="app_name">Plain</string>
+
+
+
+
+
+  <string name="hint_reply">Reply</string>
 
 
 
@@ -18,5 +26,13 @@
   <string name="transition_shot" translatable="false">shot</string>
   <string name="transition_shot_title" translatable="false">shot_title</string>
   <string name="transition_shot_background" translatable="false">shot_background</string>
+
+
+
+  <string name="transition_player_avatar" translatable="false">transition_player_avatar</string>
+  <string name="transition_player_background" translatable="false">transition_player_background</string>
+
+
+  <string name="comment_likes_count">0</string>
 
 </resources>

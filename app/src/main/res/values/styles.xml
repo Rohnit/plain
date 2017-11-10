@@ -63,8 +63,12 @@
   </style>
 
   <!-- todo revert to material styles? -->
-
-
+  <style name="TextAppearance.Comment" parent="@android:style/TextAppearance.Material.Body1">
+    <item name="android:textSize">15sp</item>
+    <item name="android:textColor">@color/text_secondary_dark</item>
+    <item name="lineHeightHint">24sp</item>
+    <!--<item name="android:letterSpacing">0.01</item>-->
+  </style>
 
   <style name="TextAppearance.CommentAuthor" parent="@android:style/TextAppearance.Material.Caption">
     <item name="android:fontFamily">sans-serif-medium</item>
@@ -73,7 +77,9 @@
     <item name="android:letterSpacing">0.02</item>
   </style>
 
-
+  <style name="TextAppearance.CommentAuthor.Dribbble">
+    <item name="android:textColor">@color/dribble_comment_author</item>
+  </style>
 
 
   <style name="TextAppearance.CommentTimestamp" parent="@android:style/TextAppearance.Material.Caption">
@@ -105,7 +111,11 @@
     <item name="lineHeightHint">24sp</item>
   </style>
 
-
+  <!-- By default float labels (well, the design lib) rely on AppCompat which we're not using
+         yet (minSdk=21). We use this style to work around this and to provide the accent color. -->
+  <style name="TextAppearance.FloatLabelHint" parent="@android:style/TextAppearance.Material.Caption">
+    <item name="android:textColor">?android:colorAccent</item>
+  </style>
 
 
 
