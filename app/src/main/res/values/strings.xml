@@ -1,0 +1,22 @@
+<resources>
+  <string name="app_name">Plain</string>
+
+
+
+
+
+
+  <!-- dribbble shot screen -->
+  <!-- using strings for the number of views/likes as we run them through NumberFormat -->
+
+
+  <string name="share">share</string>
+
+
+
+  <!-- transition shared elements -->
+  <string name="transition_shot" translatable="false">shot</string>
+  <string name="transition_shot_title" translatable="false">shot_title</string>
+  <string name="transition_shot_background" translatable="false">shot_background</string>
+
+</resources>
