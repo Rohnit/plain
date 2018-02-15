@@ -41,7 +41,7 @@
       android:transitionName="@string/transition_player_avatar"
       android:src="@drawable/avatar_placeholder" />
 
-    <io.plaidapp.ui.widget.BaselineGridTextView
+    <io.plainapp.ui.widget.BaselineGridTextView
       android:id="@+id/player_name"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
