@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "io.plainapp"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
         archivesBaseName = "plain"
