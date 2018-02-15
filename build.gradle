@@ -7,20 +7,35 @@ buildscript {
             'buildTools'    : '26.0.2',
             'butterknife'   : '8.8.1',
             'glide'         : '4.2.0',
-            'kotlin'        : '1.1.51',
+            'kotlin'        : '1.2.10',
             'retrofit'      : '2.3.0',
             'supportLibrary': '26.1.0'
     ]
     repositories {
         google()
         jcenter()
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.2' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.2' }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
 

@@ -151,4 +151,11 @@
   </style>
 
 
+
+
+  <style name="TextAppearance.Author.Title" parent="@style/TextAppearance.CommentAuthor">
+    <item name="android:textSize">20sp</item>
+    <item name="lineHeightHint">28sp</item>
+  </style>
+
 </resources>
