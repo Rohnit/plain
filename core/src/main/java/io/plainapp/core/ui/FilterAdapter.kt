@@ -1,14 +1,26 @@
 package io.plainapp.core.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
+import io.plainapp.core.ui.recyclerview.FilterSwipeDismissListener
 import io.plainapp.core.R
 import io.plainapp.core.data.Source
+import io.plainapp.core.data.prefs.SourceManager
+import io.plainapp.core.util.AnimUtils
+import io.plainapp.core.util.ColorUtils
+import io.plainapp.core.util.ViewUtils
+import java.util.*
 import javax.inject.Inject
 
 
@@ -18,7 +30,7 @@ import javax.inject.Inject
 class FilterAdapter @Inject constructor(
         context: Context,
         val filters: MutableList<Source>
-) : RecyclerView.Adapter<FilterViewHolder>()/*, FilterSwipeDismissListener*/ {
+) : RecyclerView.Adapter<FilterViewHolder>(), FilterSwipeDismissListener {
 
     private val context: Context = context.applicationContext
     private var callbacks: MutableList<FiltersChangedCallbacks> = ArrayList()
@@ -30,20 +42,149 @@ class FilterAdapter @Inject constructor(
         setHasStableIds(true)
     }
 
+    /**
+     * Adds a new data source to the list of filters. If the source already exists then it is simply
+     * activated.
+     *
+     * @param toAdd the source to add
+     * @return whether the filter was added (i.e. if it did not already exist)
+     */
+    fun addFilter(toAdd: Source): Boolean {
+        // first check if it already exists
+        for (i in 0 until filters.size) {
+            val existing = filters[i]
+            if (existing.javaClass == toAdd.javaClass &&
+                    existing.key.equals(toAdd.key, ignoreCase = true)
+            ) {
+                // already exists, just ensure it's active
+                if (!existing.active) {
+                    existing.active = true
+                    dispatchFiltersChanged(existing)
+                    notifyItemChanged(i, FilterAnimator.FILTER_ENABLED)
+                    SourceManager.updateSource(existing, context)
+                }
+                return false
+            }
+        }
+        // didn't already exist, so add it
+        filters.add(toAdd)
+        Collections.sort(filters, Source.SourceComparator())
+        dispatchFiltersChanged(toAdd)
+        notifyDataSetChanged()
+        SourceManager.addSource(toAdd, context)
+        return true
+    }
+
+    private fun removeFilter(removing: Source) {
+        val position = getFilterPosition(removing)
+        filters.removeAt(position)
+        notifyItemRemoved(position)
+        dispatchFilterRemoved(removing)
+        SourceManager.removeSource(removing, context)
+    }
+
+    fun getFilterPosition(filter: Source) = filters.indexOf(filter)
+
+    fun enableFilterByKey(key: String, context: Context) {
+        val count = filters.size
+        for (i in 0 until count) {
+            val filter = filters[i]
+            if (filter.key == key) {
+                if (!filter.active) {
+                    filter.active = true
+                    notifyItemChanged(i, FilterAnimator.FILTER_ENABLED)
+                    dispatchFiltersChanged(filter)
+                    SourceManager.updateSource(filter, context)
+                }
+                return
+            }
+        }
+    }
+
+    fun highlightFilter(adapterPosition: Int) {
+        notifyItemChanged(adapterPosition, FilterAnimator.HIGHLIGHT)
+    }
+
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): FilterViewHolder {
         val holder = FilterViewHolder(
                 LayoutInflater.from(viewGroup.context)
                         .inflate(R.layout.filter_item, viewGroup, false)
         )
+
+        holder.itemView.setOnClickListener {
+            val position = holder.adapterPosition
+            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+            val filter = filters[position]
+            filter.active = !filter.active
+            holder.filterName.isEnabled = filter.active
+            notifyItemChanged(
+                    position, if (filter.active) {
+                FilterAnimator.FILTER_ENABLED
+            } else {
+                FilterAnimator.FILTER_DISABLED
+            }
+            )
+            SourceManager.updateSource(filter, holder.itemView.context)
+            dispatchFiltersChanged(filter)
+        }
+
         return holder
     }
+
+
+    override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
+        val filter = filters[position]
+        with(holder) {
+            isSwipeable = filter.isSwipeDismissable
+            filterName.text = filter.name
+            filterName.isEnabled = filter.active
+            if (filter.iconRes > 0) {
+                filterIcon.setImageDrawable(
+                        itemView.context.getDrawable(filter.iconRes)
+                )
+            }
+            filterIcon.imageAlpha = if (filter.active)
+                FILTER_ICON_ENABLED_ALPHA
+            else
+                FILTER_ICON_DISABLED_ALPHA
+        }
+    }
+
+    override fun onBindViewHolder(
+            holder: FilterViewHolder,
+            position: Int,
+            partialChangePayloads: List<Any>
+    ) {
+        if (!partialChangePayloads.isEmpty()) {
+            // if we're doing a partial re-bind i.e. an item is enabling/disabling or being
+            // highlighted then data hasn't changed. Just set state based on the payload
+            val filterEnabled = partialChangePayloads.contains(FilterAnimator.FILTER_ENABLED)
+            val filterDisabled = partialChangePayloads.contains(FilterAnimator.FILTER_DISABLED)
+            if (filterEnabled || filterDisabled) {
+                holder.filterName.isEnabled = filterEnabled
+                // icon is handled by the animator
+            }
+            // nothing to do for highlight
+        } else {
+            onBindViewHolder(holder, position)
+        }
+    }
+
 
     override fun getItemCount(): Int {
         return filters.size
     }
 
-    override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
 
+    override fun getItemId(position: Int): Long {
+        return filters[position].key.hashCode().toLong()
+    }
+
+    override fun onItemDismiss(position: Int) {
+        val removing = filters[position]
+        if (removing.isSwipeDismissable) {
+            removeFilter(removing)
+        }
     }
 
 
@@ -54,6 +195,19 @@ class FilterAdapter @Inject constructor(
     fun unregisterFilterChangedCallback(callback: FiltersChangedCallbacks) {
         if (!callbacks.isEmpty()) {
             callbacks.remove(callback)
+        }
+    }
+
+
+    private fun dispatchFiltersChanged(filter: Source) {
+        for (callback in callbacks) {
+            callback.onFiltersChanged(filter)
+        }
+    }
+
+    private fun dispatchFilterRemoved(filter: Source) {
+        for (callback in callbacks) {
+            callback.onFilterRemoved(filter)
         }
     }
 
@@ -82,4 +236,115 @@ class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var filterName: TextView = itemView.findViewById(R.id.filter_name)
     var filterIcon: ImageView = itemView.findViewById(R.id.filter_icon)
     var isSwipeable: Boolean = false
+}
+
+class FilterAnimator : DefaultItemAnimator() {
+
+    override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+        return true
+    }
+
+    override fun obtainHolderInfo(): RecyclerView.ItemAnimator.ItemHolderInfo {
+        return FilterHolderInfo()
+    }
+
+    internal class FilterHolderInfo : RecyclerView.ItemAnimator.ItemHolderInfo() {
+        var doEnable: Boolean = false
+        var doDisable: Boolean = false
+        var doHighlight: Boolean = false
+    }
+
+    override fun recordPreLayoutInformation(
+            state: RecyclerView.State,
+            viewHolder: RecyclerView.ViewHolder,
+            changeFlags: Int,
+            payloads: List<Any>
+    ): RecyclerView.ItemAnimator.ItemHolderInfo {
+        val info = super.recordPreLayoutInformation(
+                state,
+                viewHolder,
+                changeFlags,
+                payloads
+        ) as FilterHolderInfo
+        if (!payloads.isEmpty()) {
+            info.doEnable = payloads.contains(FILTER_ENABLED)
+            info.doDisable = payloads.contains(FILTER_DISABLED)
+            info.doHighlight = payloads.contains(HIGHLIGHT)
+        }
+        return info
+    }
+
+    override fun animateChange(
+            oldHolder: RecyclerView.ViewHolder,
+            newHolder: RecyclerView.ViewHolder,
+            preInfo: RecyclerView.ItemAnimator.ItemHolderInfo,
+            postInfo: RecyclerView.ItemAnimator.ItemHolderInfo
+    ): Boolean {
+        if (newHolder is FilterViewHolder && preInfo is FilterHolderInfo) {
+
+            if (preInfo.doEnable || preInfo.doDisable) {
+                val iconAlpha = ObjectAnimator.ofInt(
+                        newHolder.filterIcon,
+                        ViewUtils.IMAGE_ALPHA,
+                        if (preInfo.doEnable) {
+                            FilterAdapter.FILTER_ICON_ENABLED_ALPHA
+                        } else {
+                            FilterAdapter.FILTER_ICON_DISABLED_ALPHA
+                        }
+                )
+                iconAlpha.duration = 300L
+                iconAlpha.interpolator = AnimUtils.getFastOutSlowInInterpolator(
+                        newHolder
+                                .itemView.context
+                )
+                iconAlpha.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        dispatchChangeStarting(newHolder, false)
+                        newHolder.itemView.setHasTransientState(true)
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        newHolder.itemView.setHasTransientState(false)
+                        dispatchChangeFinished(newHolder, false)
+                    }
+                })
+                iconAlpha.start()
+            } else if (preInfo.doHighlight) {
+                val highlightColor =
+                        ContextCompat.getColor(newHolder.itemView.context, R.color.accent)
+                val fadeFromTo = ColorUtils.modifyAlpha(highlightColor, 0)
+
+                ObjectAnimator.ofArgb(
+                        newHolder.itemView,
+                        ViewUtils.BACKGROUND_COLOR,
+                        fadeFromTo,
+                        highlightColor,
+                        fadeFromTo
+                ).apply {
+                    duration = 1000L
+                    interpolator = LinearInterpolator()
+                    addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator) {
+                            dispatchChangeStarting(newHolder, false)
+                            newHolder.itemView.setHasTransientState(true)
+                        }
+
+                        override fun onAnimationEnd(animation: Animator) {
+                            newHolder.itemView.background = null
+                            newHolder.itemView.setHasTransientState(false)
+                            dispatchChangeFinished(newHolder, false)
+                        }
+                    })
+                }.start()
+            }
+        }
+        return super.animateChange(oldHolder, newHolder, preInfo, postInfo)
+    }
+
+    companion object {
+
+        const val FILTER_ENABLED = 1
+        const val FILTER_DISABLED = 2
+        const val HIGHLIGHT = 3
+    }
 }

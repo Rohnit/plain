@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.plainapp.R;
 import io.plainapp.core.data.DataManager;
+import io.plainapp.core.designernews.data.login.LoginRepository;
 import io.plainapp.core.ui.FeedAdapter;
 import io.plainapp.core.ui.FilterAdapter;
 
@@ -51,14 +52,14 @@ public class HomeActivity extends Activity{
     private boolean monitoringConnectivity = false;
 
     // data
-    @Inject
+    /*@Inject
     DataManager dataManager;
     @Inject
     FeedAdapter adapter;
     @Inject
     FilterAdapter filtersAdapter;
-//    @Inject
-//    LoginRepository loginRepository;
+    @Inject
+    LoginRepository loginRepository;*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

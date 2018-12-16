@@ -20,7 +20,7 @@ fun inject(
         activity: HomeActivity,
         dataLoadedCallback: BaseDataManager.OnDataLoadedCallback<List<PlaidItem>>
 ) {
-    DaggerHomeComponent.builder()
+    /*DaggerHomeComponent.builder()
             .coreComponent(PlainApplication.coreComponent(activity))
             .dataManagerModule(DataManagerModule())
             .dataLoadedModule(OnDataLoadedModule(dataLoadedCallback))
@@ -30,5 +30,5 @@ fun inject(
                     SharedPreferencesModule(activity, LoginLocalDataSource.DESIGNER_NEWS_PREF)
             )
             .build()
-            .inject(activity)
+            .inject(activity)*/
 }
