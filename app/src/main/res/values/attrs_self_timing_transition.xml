@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <attr name="velocity" format="dimension" />
+    <attr name="minDuration" format="integer" />
+    <attr name="maxDuration" format="integer" />
+
+</resources>

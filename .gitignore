@@ -3,6 +3,7 @@
 .gradle
 .DS_Store
 build
+local.properties
 captures
 *.project
 *.buildship.core.prefs

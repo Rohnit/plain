@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <!-- designer news -->
+    <color name="designer_news_story_comment_background">@color/background_light</color>
+
+</resources>

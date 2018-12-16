@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- using a layer-list even though there is only a single layer as this seems to respect
+     theme attribs i.e. to set the height for the toolbar placeholder. The below seems more
+     semantically correct but doesn't work. -->
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+    <item android:height="?android:actionBarSize">
+        <color android:color="@color/designer_news" />
+    </item>
+</layer-list>
+
+<!--<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/designer_news" />
+    <size android:height="?android:actionBarSize" />
+</shape>-->

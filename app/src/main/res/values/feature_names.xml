@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="feature_name_app" value="app" />
+    <string name="feature_name_designernews" value="designernews" />
+    <string name="feature_name_dribbble" value="dribbble" />
+    <string name="feature_name_about" value="about" />
+</resources>

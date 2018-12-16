@@ -2,17 +2,22 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply from: '../core_dependencies.gradle'
+apply from: '../test_dependencies.gradle'
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+//    buildToolsVersion versions.buildTools
     defaultConfig {
         applicationId "io.plainapp"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
         archivesBaseName = "plain"
+
         resConfig "en"
         buildConfigField "String", "DRIBBBLE_CLIENT_ID", "\"${dribbble_client_id}\""
         buildConfigField "String", "DRIBBBLE_CLIENT_SECRET", "\"${dribbble_client_secret}\""
@@ -25,8 +30,13 @@ android {
                 "PROCUCT_HUNT_DEVELOPER_TOKEN", "\"${product_hunt_developer_token}\""
         def filesAuthorityValue = applicationId + ".shareprovider"
         buildConfigField "String", "FILES_AUTHORITY", "\"${filesAuthorityValue}\""
-        manifestPlaceholders = [filesAuthority: filesAuthorityValue]
+//        manifestPlaceholders = [filesAuthority: filesAuthorityValue]
     }
+
+    dataBinding {
+        enabled true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -34,35 +44,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 repositories {
     jcenter()
     google()
+    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap' }
 }
 
 dependencies {
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
-    implementation "com.android.support:customtabs:${versions.supportLibrary}"
-    implementation "com.android.support:design:${versions.supportLibrary}"
-    implementation "com.android.support:palette-v7:${versions.supportLibrary}"
-    implementation "com.android.support:recyclerview-v7:${versions.supportLibrary}"
-    implementation "com.android.support:support-dynamic-animation:${versions.supportLibrary}"
-    implementation "com.github.bumptech.glide:glide:${versions.glide}"
-    annotationProcessor "com.github.bumptech.glide:compiler:${versions.glide}"
-    implementation "com.github.bumptech.glide:okhttp3-integration:${versions.glide}"
-    implementation "com.github.bumptech.glide:recyclerview-integration:${versions.glide}"
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation "com.jakewharton:butterknife:${versions.butterknife}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-    implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
-    implementation "com.squareup.retrofit2:converter-gson:${versions.retrofit}"
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:${versions.kotlin}"
-    implementation 'org.jsoup:jsoup:1.10.3'
-    implementation project(':bypass')
+
+    implementation project(':core')
+
+    kapt "com.google.dagger:dagger-compiler:${versions.dagger}"
 }

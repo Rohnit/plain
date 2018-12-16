@@ -1,0 +1,64 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply from: '../core_dependencies.gradle'
+apply from: '../test_dependencies.gradle'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+
+        buildConfigField 'String', 'DESIGNER_NEWS_CLIENT_ID', "\"${designer_news_client_id}\""
+        buildConfigField 'String',
+                'DESIGNER_NEWS_CLIENT_SECRET', "\"${designer_news_client_secret}\""
+
+        buildConfigField 'String',
+                'PRODUCT_HUNT_DEVELOPER_TOKEN', "\"${product_hunt_developer_token}\""
+
+    }
+
+    dataBinding {
+        enabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/core_debug.kotlin_module'
+    }
+
+}
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap' }
+}
+
+dependencies {
+    kapt "androidx.room:room-compiler:${versions.room}"
+    kapt "com.github.bumptech.glide:compiler:${versions.glide}"
+    kapt "com.google.dagger:dagger-compiler:${versions.dagger}"
+}
+
+androidExtensions {
+    experimental = true
+}
